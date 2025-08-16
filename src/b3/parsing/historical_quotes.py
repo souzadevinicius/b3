@@ -1,22 +1,26 @@
 from __future__ import annotations
+
 import collections
 import contextlib
-from decimal import Decimal
 import enum
 import functools
 import os
 from datetime import date
-from typing import Dict, Union, Any, Tuple, Generator, TextIO, cast
+from decimal import Decimal
+from typing import Any, Dict, Generator, TextIO, Tuple, Union, cast
+
+from loguru import logger
+
 from b3.datatypes import (
-    DailyBulletinType,
-    DailyBulletin,
-    MarketType,
     ContractCorrection,
-    QuoteSize,
+    DailyBulletin,
+    DailyBulletinType,
+    MarketType,
     Quotes,
+    QuoteSize,
 )
 from b3.datatypes.specification import Specification
-from b3.utils import date_from_string, pic11v99, pic16v99, pic7v06
+from b3.utils import date_from_string, pic7v06, pic11v99, pic16v99
 
 __all__ = ["historical_quotes_reader"]
 
@@ -80,9 +84,9 @@ def _parse_quotes_line(line: str) -> Dict[str, Any]:
             value = line[pos:stop]
             values[field_name] = factory(value.strip())
         except (IndexError, ValueError) as exc:
-            print(f"failed to read field '{field_name}': {exc}")
+            logger.warning(f"failed to read field '{field_name}': {exc}")
             # raise
-            # continue
+            continue
         else:
             pos = stop
 
